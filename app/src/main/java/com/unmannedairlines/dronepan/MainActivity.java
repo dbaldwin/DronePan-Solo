@@ -1,11 +1,14 @@
 package com.unmannedairlines.dronepan;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
     private ControlTower controlTower;
     private final Handler handler = new Handler();
     private boolean panoInProgress = false;
+    private TextureView cameraView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +108,30 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
             }
         });
 
+        // Camera preview
+        cameraView = (TextureView) findViewById(R.id.cameraView);
+        cameraView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+
+            }
+
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+            }
+
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                return true;
+            }
+
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+            }
+        });
+
 
     }
 
@@ -152,12 +180,14 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
             case AttributeEvent.STATE_CONNECTED:
                 TextView connectionStatusTextView = (TextView)findViewById(R.id.connectionStatus);
                 connectionStatusTextView.setText("Connected");
+                startVideoFeed();
                 break;
 
             case AttributeEvent.STATE_DISCONNECTED:
                 connectionStatusTextView = (TextView)findViewById(R.id.connectionStatus);
                 connectionStatusTextView.setText("Disconnected");
                 //updateConnectedButton(this.drone.isConnected());
+                stopVideoFeed();
                 break;
 
             case AttributeEvent.ALTITUDE_UPDATED:
@@ -191,6 +221,32 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
     public void showToast(String toast) {
         Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_SHORT).show();
+    }
+
+    private void startVideoFeed() {
+        SoloCameraApi.getApi(drone).startVideoStream(new Surface(cameraView.getSurfaceTexture()), "", true, new AbstractCommandListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError(int executionError) {
+
+            }
+
+            @Override
+            public void onTimeout() {
+            }
+        });
+    }
+
+    private void stopVideoFeed() {
+        SoloCameraApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+        });
     }
 
     public void armDrone() {
