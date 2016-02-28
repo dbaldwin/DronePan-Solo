@@ -19,6 +19,7 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.ControlApi;
 import com.o3dr.android.client.apis.GimbalApi;
 import com.o3dr.android.client.apis.VehicleApi;
+import com.o3dr.android.client.apis.solo.SoloApi;
 import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
@@ -459,8 +460,8 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
                     pitchGimbal(0);
 
-                    // Change mode back to altitude hold, which I think is the same as "FLY" mode
-                    VehicleApi.getApi(drone).setVehicleMode(VehicleMode.COPTER_ALT_HOLD, new SimpleCommandListener() {
+                    // Change mode back to FLY mode, which is Loiter
+                    VehicleApi.getApi(drone).setVehicleMode(VehicleMode.COPTER_LOITER, new SimpleCommandListener() {
                         @Override
                         public void onSuccess() {
                             showToast("Panorama complete! You can now take control of Solo.");
