@@ -72,33 +72,6 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
         this.controlTower = new ControlTower(context);
         this.drone = new Drone(context);
 
-        // Link up the buttons
-        final Button armButton = (Button) findViewById(R.id.button);
-        armButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                armDrone();
-            }
-        });
-
-        // Yaw button test
-        final Button yawButton = (Button) findViewById(R.id.button2);
-        yawButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //yawTimer();
-            }
-        });
-
-        // Pitch gimbal button test
-        final Button pitchButton = (Button) findViewById(R.id.button3);
-        pitchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pitchGimbal(0);
-            }
-        });
-
         // Timer loop test button
         final Button timerButton = (Button) findViewById(R.id.button4);
         timerButton.setOnClickListener(new View.OnClickListener() {
