@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
             case AttributeEvent.ALTITUDE_UPDATED:
                 TextView altitudeTextView = (TextView)findViewById(R.id.altitudeTextView);
                 Altitude droneAltitude = this.drone.getAttribute(AttributeType.ALTITUDE);
-                altitudeTextView.setText(String.format("%3.1f", droneAltitude.getAltitude()) + "m");
+                altitudeTextView.setText(String.format("Alt: %3.1f", droneAltitude.getAltitude()) + "m");
                 break;
 
             case AttributeEvent.STATE_VEHICLE_MODE:

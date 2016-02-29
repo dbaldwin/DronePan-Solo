@@ -26,12 +26,6 @@
                 android:textColor="#ffffff" />
 
             <TextView
-                android:layout_width="47dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/textView" />
-
-            <TextView
                 android:layout_width="383dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
