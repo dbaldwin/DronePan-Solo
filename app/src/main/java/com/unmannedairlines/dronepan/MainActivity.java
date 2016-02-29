@@ -58,19 +58,7 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Hide the status bar
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
-        // Hide the action bar
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        hideStatusAndActionBars();
 
         // Initialize the drone objects
         final Context context = getApplicationContext();
@@ -129,6 +117,29 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
         // Progress bar for showing pano progress
         panoProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
+    }
+
+    private void hideStatusAndActionBars() {
+        // Hide the status bar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+        // Hide the action bar
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+    }
+
+    // When waking up let's keep the status and action bars hidden
+    @Override
+    public void onResume() {
+        super.onResume();
+        hideStatusAndActionBars();
     }
 
     @Override
