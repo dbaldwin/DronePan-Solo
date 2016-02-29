@@ -10,10 +10,8 @@ import android.os.Handler;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +20,6 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.ControlApi;
 import com.o3dr.android.client.apis.GimbalApi;
 import com.o3dr.android.client.apis.VehicleApi;
-import com.o3dr.android.client.apis.solo.SoloApi;
 import com.o3dr.android.client.apis.solo.SoloCameraApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
@@ -40,12 +37,20 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 public class MainActivity extends AppCompatActivity implements TowerListener, DroneListener {
+
     private Drone drone;
     private int droneType = Type.TYPE_UNKNOWN;
     private ControlTower controlTower;
     private final Handler handler = new Handler();
     private boolean panoInProgress = false;
+
     private TextureView cameraView;
+    private Button panoButton;
+
+    // Progress bar
+    private ProgressBar panoProgressBar;
+    private int totalPhotoCount = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +77,28 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
         this.controlTower = new ControlTower(context);
         this.drone = new Drone(context);
 
-        // Timer loop test button
-        final Button timerButton = (Button) findViewById(R.id.button4);
-        timerButton.setOnClickListener(new View.OnClickListener() {
+        // Pano button manages starting and stopping panos
+        panoButton = (Button) findViewById(R.id.panoButton);
+        panoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setupPano();
+
+                // Start the pano
+                if(!panoInProgress) {
+
+                    showToast("Starting panorama.");
+                    setupPano();
+
+                // Stop the pano
+                } else {
+
+                    showToast("Stopping panorama. Please stand by.");
+                    panoInProgress = false;
+
+                    // Let's disable the button so it doesn't get double-clicked
+                    panoButton.setEnabled(false);
+
+                }
             }
         });
 
@@ -105,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
             }
         });
 
+        // Progress bar for showing pano progress
+        panoProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
     }
 
@@ -272,20 +295,24 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
     }
 
     private static final int NUM_COLUMNS = 6;
-    private int photo_count = 0;
-    private int loop_count = 0;
+    private int loopCount = 0;
     private int[] pitches = {0, -30, -60, -90};
+    private int photoCount = 0;
 
     // Change to guided mode, start gimbal control, reset the gimbal to 0, and set mode to guided
     private void setupPano() {
 
+        totalPhotoCount = 0;
+        panoProgressBar.setProgress(totalPhotoCount);
         panoInProgress = true;
+
+        // Change start button to stop button
+        panoButton.setText("Stop");
 
         // Set copter to guided
         VehicleApi.getApi(this.drone).setVehicleMode(VehicleMode.COPTER_GUIDED, new SimpleCommandListener() {
             @Override
             public void onSuccess() {
-                showToast("Solo changed to GUIDED mode");
             }
         });
 
@@ -312,6 +339,31 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
     private void loopAndShoot() {
 
+        // The pano stop button was clicked so let's reset a bunch of stuff
+        if(!panoInProgress) {
+
+            panoButton.setText("Start");
+
+            // Reset gimbal and give control back to user
+
+            // Changing vehicle mode back to FLY
+            VehicleApi.getApi(this.drone).setVehicleMode(VehicleMode.COPTER_LOITER, new SimpleCommandListener() {
+                @Override
+                public void onSuccess() {
+                }
+            });
+
+            // Reset the progress bar
+            panoProgressBar.setProgress(0);
+
+            // Enable the start button again
+            panoButton.setEnabled(true);
+
+            showToast("Your panorama has been stopped successfully.");
+
+            return;
+        }
+
         final Handler h = new Handler();
 
         // Pitch the gimbal
@@ -323,24 +375,31 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
                 if(Build.MODEL.contains("SDK")) {
 
-                    showToast("Pitching gimbal to: " + pitches[loop_count]);
+                    showToast("Pitching gimbal to: " + pitches[loopCount]);
 
                 } else {
 
-                    pitchGimbal(pitches[loop_count]);
+                    pitchGimbal(pitches[loopCount]);
 
                 }
 
-                photo_count = 0;
+                photoCount = 0;
 
                 // Take nadir shot
-                if(loop_count == 3) {
+                if(loopCount == 3) {
 
-                    loop_count = 0;
+                    loopCount = 0;
 
                     takeNadirPhotoAndFinishPano();
 
-                    // Continue with photo loop
+                    // Set the progress bar to 100%
+                    panoProgressBar.setProgress(100);
+
+                    // Update the stop button
+                    panoButton.setText("Start");
+
+
+                // Continue with photo loop
                 } else {
 
                     loopAndShoot();
@@ -357,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
                 if(Build.MODEL.contains("SDK")) {
 
-                    showToast("Yaw drone: " + photo_count);
+                    showToast("Yaw drone: " + photoCount);
 
                 } else {
 
@@ -365,8 +424,8 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
                 }
 
-                if(photo_count == NUM_COLUMNS) {
-                    loop_count++;
+                if(photoCount == NUM_COLUMNS) {
+                    loopCount++;
 
                     // Now let's pitch gimbal and then we'll begin the next loop
                     h.postDelayed(pitch, 3000);
@@ -393,6 +452,10 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
                     takePhoto();
 
+                    // Update progress bar
+                    totalPhotoCount++;
+                    panoProgressBar.setProgress(totalPhotoCount*5);
+
                 }
 
                 h.postDelayed(yaw, 3000);
@@ -402,7 +465,8 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
         h.postDelayed(photo, 3000);
 
-        photo_count++;
+        photoCount++;
+
     }
 
     private void yawDrone(int angle) {
@@ -526,6 +590,7 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
     }
 
+    // Listener for when we take control of the gimbal
     GimbalApi.GimbalOrientationListener gimbalListener = new GimbalApi.GimbalOrientationListener() {
 
         @Override
