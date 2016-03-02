@@ -30,6 +30,8 @@ import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.property.Altitude;
+import com.o3dr.services.android.lib.drone.property.Battery;
+import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
@@ -193,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
             case AttributeEvent.STATE_DISCONNECTED:
                 connectionStatusTextView = (TextView)findViewById(R.id.connectionStatus);
                 connectionStatusTextView.setText("Disconnected");
-                //updateConnectedButton(this.drone.isConnected());
                 stopVideoFeed();
                 break;
 
@@ -203,11 +204,23 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
                 altitudeTextView.setText(String.format("Alt: %3.1f", droneAltitude.getAltitude()) + "m");
                 break;
 
+            case AttributeEvent.BATTERY_UPDATED:
+                TextView batteryTextView = (TextView)findViewById(R.id.batteryTextView);
+                Battery batt = this.drone.getAttribute(AttributeType.BATTERY);
+                batteryTextView.setText(String.format("Batt: %3.1f", batt.getBatteryRemain()) + "%");
+                break;
+
+            case AttributeEvent.GPS_COUNT:
+                TextView satelliteTextView = (TextView)findViewById(R.id.satelliteTextView);
+                Gps gps = this.drone.getAttribute(AttributeType.GPS);
+                satelliteTextView.setText(String.format("Sats: %3.1f", gps.getSatellitesCount()));
+                break;
+
             case AttributeEvent.STATE_VEHICLE_MODE:
                 State vehicleState = this.drone.getAttribute(AttributeType.STATE);
                 VehicleMode vehicleMode = vehicleState.getVehicleMode();
                 TextView flightModeTextView = (TextView)findViewById(R.id.flightModeTextView);
-                flightModeTextView.setText(vehicleMode.getLabel());
+                flightModeTextView.setText("Mode: " + vehicleMode.getLabel());
 
                 // If the mode is switched and the pano is in progress let's release gimbal control
                 if(vehicleMode.getLabel() != "Guided" && panoInProgress) {
@@ -340,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
 
             @Override
             public void run() {
-                loopAndShoot(); // Let's being the pano process
+                loopAndShoot(); // Let's begin the pano process
             }
         };
 

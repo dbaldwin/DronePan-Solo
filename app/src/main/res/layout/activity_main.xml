@@ -24,16 +24,59 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Alt: -"
                 android:id="@+id/altitudeTextView"
+                android:textColor="#ffffff"
+                android:paddingStart="10dp" />
+
+            <TextView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="|"
+                android:id="@+id/divider1"
+                android:textColor="#ffffff"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Batt: -"
+                android:id="@+id/batteryTextView"
                 android:textColor="#ffffff" />
 
             <TextView
-                android:layout_width="383dp"
+                android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/flightModeTextView"
+                android:text="|"
+                android:id="@+id/divider2"
                 android:textColor="#ffffff"
-                android:gravity="center_vertical|right"
-                android:text="Flight Mode" />
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Sats: -"
+                android:id="@+id/satelliteTextView"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="|"
+                android:id="@+id/divider3"
+                android:textColor="#ffffff"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Mode: -"
+                android:id="@+id/flightModeTextView"
+                android:textColor="#ffffff" />
 
             <TextView
                 android:layout_width="match_parent"
