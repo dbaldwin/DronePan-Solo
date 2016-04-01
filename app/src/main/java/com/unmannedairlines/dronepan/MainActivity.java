@@ -201,19 +201,19 @@ public class MainActivity extends AppCompatActivity implements TowerListener, Dr
             case AttributeEvent.ALTITUDE_UPDATED:
                 TextView altitudeTextView = (TextView)findViewById(R.id.altitudeTextView);
                 Altitude droneAltitude = this.drone.getAttribute(AttributeType.ALTITUDE);
-                altitudeTextView.setText(String.format("Alt: %3.1f", droneAltitude.getAltitude()) + "m");
+                altitudeTextView.setText(String.format("Alt: %3.1f m", droneAltitude.getAltitude()));
                 break;
 
             case AttributeEvent.BATTERY_UPDATED:
                 TextView batteryTextView = (TextView)findViewById(R.id.batteryTextView);
                 Battery batt = this.drone.getAttribute(AttributeType.BATTERY);
-                batteryTextView.setText(String.format("Batt: %3.1f", batt.getBatteryRemain()) + "%");
+                batteryTextView.setText(String.format("Batt: %3.1f%%", batt.getBatteryRemain()));
                 break;
 
             case AttributeEvent.GPS_COUNT:
                 TextView satelliteTextView = (TextView)findViewById(R.id.satelliteTextView);
                 Gps gps = this.drone.getAttribute(AttributeType.GPS);
-                satelliteTextView.setText(String.format("Sats: %3.1f", gps.getSatellitesCount()));
+                satelliteTextView.setText(String.format("Sats: %2d", gps.getSatellitesCount()));
                 break;
 
             case AttributeEvent.STATE_VEHICLE_MODE:
